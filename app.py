@@ -1,4 +1,5 @@
 import os
+import gzip
 import pandas as pd
 import streamlit as st
 
@@ -7,18 +8,30 @@ st.set_page_config(page_title="Gene Expression Dashboard", layout="wide")
 # ---------------------------------------------------------
 # HELPER FUNCTIONS
 # ---------------------------------------------------------
-import pandas as pd
-
 def read_expression_or_meta(file_input):
     """
-    Reads tabular data (.csv, .tsv, .txt) including gzipped files (.gz).
-    Uses engine='python' with sep=None to automatically infer the delimiter.
+    Reads tabular data (.csv, .tsv, .txt) including gzipped files (.gz) for Python 3.14+.
+    Handles uploaded file objects and local file paths transparently.
     """
-    # sep=None allows pandas to inspect the uncompressed stream and auto-detect '\t' vs ','
+    # Get filename string
+    file_name = getattr(file_input, "name", str(file_input)).lower()
+    
+    # Strip .gz extension if present to inspect underlying type
+    if file_name.endswith(".gz"):
+        base_name = file_name[:-3]
+    else:
+        base_name = file_name
+
+    # Determine delimiter based on base extension
+    if base_name.endswith((".tsv", ".txt")):
+        sep = "\t"
+    else:
+        sep = ","
+
+    # Read dataframe with C engine (fast & fully compatible with Python 3.14)
     df = pd.read_csv(
         file_input, 
-        sep=None, 
-        engine="python", 
+        sep=sep, 
         index_col=0, 
         compression="infer"
     )
