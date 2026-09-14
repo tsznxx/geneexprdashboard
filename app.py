@@ -19,8 +19,10 @@ def read_expression_or_meta(file_input):
     # Strip .gz extension if present to inspect underlying type
     if file_name.endswith(".gz"):
         base_name = file_name[:-3]
+        compression='gzip'
     else:
         base_name = file_name
+        compression=None
 
     # Determine delimiter based on base extension
     if base_name.endswith((".tsv", ".txt")):
@@ -33,7 +35,7 @@ def read_expression_or_meta(file_input):
         file_input, 
         sep=sep, 
         index_col=0, 
-        compression="infer"
+        compression=compression
     )
     return df
 
