@@ -7,14 +7,22 @@ st.set_page_config(page_title="Gene Expression Dashboard", layout="wide")
 # ---------------------------------------------------------
 # HELPER FUNCTIONS
 # ---------------------------------------------------------
-def detect_delimiter(file_name_or_obj):
-    name = getattr(file_name_or_obj, "name", str(file_name_or_obj))
-    return "\t" if (".tsv" in name or ".txt" in name) else ","
+import pandas as pd
 
 def read_expression_or_meta(file_input):
-    sep = detect_delimiter(file_input)
-    st.write(sep)
-    return pd.read_csv(file_input, sep=sep, index_col=0, compression="infer")
+    """
+    Reads tabular data (.csv, .tsv, .txt) including gzipped files (.gz).
+    Uses engine='python' with sep=None to automatically infer the delimiter.
+    """
+    # sep=None allows pandas to inspect the uncompressed stream and auto-detect '\t' vs ','
+    df = pd.read_csv(
+        file_input, 
+        sep=None, 
+        engine="python", 
+        index_col=0, 
+        compression="infer"
+    )
+    return df
 
 def reset_app_state():
     """Clears loaded datasets and increments uploader keys to reset widgets."""
