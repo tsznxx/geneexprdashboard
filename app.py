@@ -13,6 +13,7 @@ def detect_delimiter(file_name_or_obj):
 
 def read_expression_or_meta(file_input):
     sep = detect_delimiter(file_input)
+    st.write(sep)
     return pd.read_csv(file_input, sep=sep, index_col=0, compression="infer")
 
 def reset_app_state():
